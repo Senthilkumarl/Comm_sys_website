@@ -1,0 +1,1129 @@
+(function($) {
+  Drupal.behaviors.initMenu = {
+    attach: function(context, settings) {
+      /*! npm.im/object-fit-images 3.2.3 */
+      var objectFitImages = (function() {
+        'use strict';
+        function t(t, e) {
+          return (
+            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='" +
+            t +
+            "' height='" +
+            e +
+            "'%3E%3C/svg%3E"
+          );
+        }
+        function e(t) {
+          if (t.srcset && !m && window.picturefill) {
+            var e = window.picturefill._;
+            (t[e.ns] && t[e.ns].evaled) || e.fillImg(t, { reselect: !0 }),
+              t[e.ns].curSrc ||
+                ((t[e.ns].supported = !1), e.fillImg(t, { reselect: !0 })),
+              (t.currentSrc = t[e.ns].curSrc || t.src);
+          }
+        }
+        function i(t) {
+          for (
+            var e, i = getComputedStyle(t).fontFamily, r = {};
+            null !== (e = l.exec(i));
+
+          )
+            r[e[1]] = e[2];
+          return r;
+        }
+        function r(e, i, r) {
+          var n = t(i || 1, r || 0);
+          p.call(e, 'src') !== n && b.call(e, 'src', n);
+        }
+        function n(t, e) {
+          t.naturalWidth ? e(t) : setTimeout(n, 100, t, e);
+        }
+        function c(t) {
+          var c = i(t),
+            o = t[a];
+          if (((c['object-fit'] = c['object-fit'] || 'fill'), !o.img)) {
+            if ('fill' === c['object-fit']) return;
+            if (!o.skipTest && g && !c['object-position']) return;
+          }
+          if (!o.img) {
+            (o.img = new Image(t.width, t.height)),
+              (o.img.srcset = p.call(t, 'data-ofi-srcset') || t.srcset),
+              (o.img.src = p.call(t, 'data-ofi-src') || t.src),
+              b.call(t, 'data-ofi-src', t.src),
+              t.srcset && b.call(t, 'data-ofi-srcset', t.srcset),
+              r(t, t.naturalWidth || t.width, t.naturalHeight || t.height),
+              t.srcset && (t.srcset = '');
+            try {
+              s(t);
+            } catch (t) {
+              window.console && console.warn('https://bit.ly/ofi-old-browser');
+            }
+          }
+          e(o.img),
+            (t.style.backgroundImage =
+              'url("' +
+              (o.img.currentSrc || o.img.src).replace(/"/g, '\\"') +
+              '")'),
+            (t.style.backgroundPosition = c['object-position'] || 'center'),
+            (t.style.backgroundRepeat = 'no-repeat'),
+            (t.style.backgroundOrigin = 'content-box'),
+            /scale-down/.test(c['object-fit'])
+              ? n(o.img, function() {
+                  o.img.naturalWidth > t.width || o.img.naturalHeight > t.height
+                    ? (t.style.backgroundSize = 'contain')
+                    : (t.style.backgroundSize = 'auto');
+                })
+              : (t.style.backgroundSize = c['object-fit']
+                  .replace('none', 'auto')
+                  .replace('fill', '100% 100%')),
+            n(o.img, function(e) {
+              r(t, e.naturalWidth, e.naturalHeight);
+            });
+        }
+        function s(t) {
+          var e = {
+            get: function(e) {
+              return t[a].img[e || 'src'];
+            },
+            set: function(e, i) {
+              return (
+                (t[a].img[i || 'src'] = e),
+                b.call(t, 'data-ofi-' + i, e),
+                c(t),
+                e
+              );
+            }
+          };
+          Object.defineProperty(t, 'src', e),
+            Object.defineProperty(t, 'currentSrc', {
+              get: function() {
+                return e.get('currentSrc');
+              }
+            }),
+            Object.defineProperty(t, 'srcset', {
+              get: function() {
+                return e.get('srcset');
+              },
+              set: function(t) {
+                return e.set(t, 'srcset');
+              }
+            });
+        }
+        function o(t, e) {
+          var i = !h && !t;
+          if (((e = e || {}), (t = t || 'img'), (f && !e.skipTest) || !d))
+            return !1;
+          'img' === t
+            ? (t = document.getElementsByTagName('img'))
+            : 'string' == typeof t
+              ? (t = document.querySelectorAll(t))
+              : 'length' in t || (t = [t]);
+          for (var r = 0; r < t.length; r++)
+            (t[r][a] = t[r][a] || { skipTest: e.skipTest }), c(t[r]);
+          i &&
+            (document.body.addEventListener(
+              'load',
+              function(t) {
+                'IMG' === t.target.tagName &&
+                  o(t.target, { skipTest: e.skipTest });
+              },
+              !0
+            ),
+            (h = !0),
+            (t = 'img')),
+            e.watchMQ &&
+              window.addEventListener(
+                'resize',
+                o.bind(null, t, { skipTest: e.skipTest })
+              );
+        }
+        var a = 'bfred-it:object-fit-images',
+          l = /(object-fit|object-position)\s*:\s*([-\w\s%]+)/g,
+          u =
+            'undefined' == typeof Image
+              ? { style: { 'object-position': 1 } }
+              : new Image(),
+          g = 'object-fit' in u.style,
+          f = 'object-position' in u.style,
+          d = 'background-size' in u.style,
+          m = 'string' == typeof u.currentSrc,
+          p = u.getAttribute,
+          b = u.setAttribute,
+          h = !1;
+        return (
+          (o.supportsObjectFit = g),
+          (o.supportsObjectPosition = f),
+          (function() {
+            function t(t, e) {
+              return t[a] && t[a].img && ('src' === e || 'srcset' === e)
+                ? t[a].img
+                : t;
+            }
+            f ||
+              ((HTMLImageElement.prototype.getAttribute = function(e) {
+                return p.call(t(this, e), e);
+              }),
+              (HTMLImageElement.prototype.setAttribute = function(e, i) {
+                return b.call(t(this, e), e, String(i));
+              }));
+          })(),
+          o
+        );
+      })();
+
+      var $currentScrollPos;
+
+      $(window).scroll(function() {
+        if ($(window).width() < 768) {
+          $currentScrollPos = $(document).scrollTop();
+        }
+      });
+
+      $(window).resize(function() {
+        resetAsides();
+      });
+
+      objectFitImages();
+      initMainMenu();
+      initSearchField();
+
+      //functions
+      function resetAsides() {
+        $('aside').each(function(i) {
+          var $this = $(this);
+
+          $this.css({
+            position: '',
+            top: '',
+            left: '',
+            width: ''
+          });
+
+          $this.removeData('init_offset');
+          $this.removeData('init_left');
+          $this.removeData('init_top');
+          $this.removeData('init_left');
+          $this.removeData('init_width');
+        });
+      }
+
+      function bottomAlignAsides() {
+        var _next_topedge = $(document).height() - $('footer').outerHeight();
+
+        $(
+          $('aside')
+            .get()
+            .reverse()
+        ).each(function(i) {
+          var $this = $(this);
+
+          if ($this.hasClass('alignbottom')) {
+            if ($this.data('init_width') == undefined) {
+              $this.data('init_width', $this.outerWidth());
+            }
+
+            $this.css({
+              position: 'absolute',
+              top:
+                _next_topedge -
+                $this.offset().top -
+                $this.outerHeight() +
+                $this.position().top,
+              left: $this.position().left,
+              width: $this.data('init_width')
+            });
+          }
+
+          _next_topedge = $this.offset().top;
+        });
+      }
+
+      function updateAsides() {
+        var _scrollpos = $(window).scrollTop();
+        var _next_topedge = $(document).height() - $('footer').outerHeight();
+
+        $(
+          $('aside')
+            .get()
+            .reverse()
+        ).each(function(i) {
+          var $this = $(this);
+
+          if ($this.data('init_offset') == undefined) {
+            $this.data('init_offset', $this.offset().top);
+          }
+
+          if ($this.data('init_left') == undefined) {
+            $this.data('init_left', $this.position().left);
+          }
+
+          if ($this.data('init_top') == undefined) {
+            $this.data('init_top', $this.position().top);
+          }
+
+          if ($this.data('init_width') == undefined) {
+            $this.data('init_width', $this.outerWidth());
+          }
+
+          var _obj = {
+            offset: $this.data('init_offset'),
+            height: $this.outerHeight(),
+            align_bottom: $this.hasClass('alignbottom'),
+            scroll_offset: 0
+          };
+
+          if (!_obj.align_bottom) {
+            _obj.scroll_offset = _scrollpos - _obj.offset;
+            var _max_offset = _next_topedge - _obj.offset - _obj.height;
+
+            if (_obj.scroll_offset < 0) {
+              //not far enough
+              $this.css({
+                position: 'absolute',
+                top: $this.data('init_top'),
+                left: $this.data('init_left'),
+                width: $this.data('init_width')
+              });
+            } else if (_obj.scroll_offset > _max_offset) {
+              //too far
+              $this.css({
+                position: 'absolute',
+                top: $this.data('init_top') + _max_offset,
+                left: $this.data('init_left'),
+                width: $this.data('init_width')
+              });
+            } else {
+              //in between
+              $this.css({
+                position: 'fixed',
+                top: 0,
+                left: $this.data('init_left'),
+                width: $this.data('init_width')
+              });
+            }
+          }
+
+          _next_topedge = _obj.offset;
+        });
+      }
+
+      function initMainMenu() {
+        $('nav.mobile .menublock:first-child ul', context).append(
+          $('header li.search')
+            .clone()
+            .addClass('focused')
+        );
+        $('nav.mobile .menublock:first-child ul').append(
+          parseMobileMenuRecursive($('.page-menu ul.primary')).addClass(
+            'pagelink'
+          )
+        );
+        $('nav.mobile .menublock:first-child ul').append(
+          parseMobileMenuRecursive($('nav.desktop ul.primary'))
+        );
+        $('nav.mobile .menublock:first-child ul').append(
+          parseMobileMenuRecursive(
+            $('ul.language-switcher-locale-url')
+          ).addClass('secondary')
+        );
+        $('nav.mobile .menublock:first-child ul').append(
+          parseMobileMenuRecursive($('ul.secondary')).addClass('secondary')
+        );
+
+        $('header ul.primary').each(function() {
+          $this = $(this);
+          $this.children('li').each(function(i) {
+            var $originmenu = $(this).children('ul');
+
+            if ($originmenu.length > 0) {
+              $(this).append("<div class='menupage row'></div>");
+              var $menupage = $(this).find('.row');
+              var _num_cols = 3;
+              var $sections = $originmenu.children('li');
+              $(this).data('sections', $sections);
+
+              // desktop:
+              // create column containers
+              var _created_cols = 0;
+
+              do {
+                _created_cols += 1;
+                $menupage.append(
+                  $(
+                    "<ul id='menucol" +
+                      i +
+                      '_' +
+                      _created_cols +
+                      "' class='desktop_menucol col-sm-4'></ul>"
+                  )
+                );
+              } while (_created_cols < _num_cols);
+
+              $(this).data(
+                'desktopcols',
+                $menupage.children('.desktop_menucol')
+              );
+
+              var _total_height = $originmenu.height();
+              var _average_height = _total_height / _num_cols;
+              var _current_col = 1;
+              var _current_col_height = 0;
+
+              $sections.each(function() {
+                var $section = $(this);
+                var _section_height = $section.height();
+
+                // if height crosses column height, check if closer before or after
+                if (_current_col_height + _section_height > _average_height) {
+                  var _prediff = _average_height - _current_col_height;
+                  var _postdiff = -(_prediff - _section_height);
+                  if (_prediff < _postdiff) {
+                    _current_col = Math.min(_num_cols, _current_col + 1);
+                  }
+                }
+
+                var $col = $menupage.find('#menucol' + i + '_' + _current_col);
+                $col.append($section);
+                _current_col_height = $col.height();
+                if (_current_col_height > _average_height) {
+                  _current_col = Math.min(_num_cols, _current_col + 1);
+                  _current_col_height = 0;
+                }
+              });
+
+              $originmenu.remove();
+            }
+          });
+        });
+
+        $('.menublock .backtab, .menublock .backlink').click(function() {
+          var $parentblock = $(this).parents('.menublock');
+          positionMobileMenu($parentblock.index() - 1);
+        });
+
+        $('.mobilemenutoggle').click(function() {
+          positionMobileMenu(0);
+        });
+
+        $(window).scroll(menuScrollHandler);
+      }
+
+      function parseMobileMenuRecursive($ul, $headeritem) {
+        // find ul > li > a
+        var $list = $('<ul />');
+
+        if ($headeritem) {
+          $list.append($headeritem);
+        }
+
+        $ul
+          .children('li:not(.search)')
+          .children('a')
+          .each(function() {
+            var $originlistitem = $(this);
+            var $listitem = $('<li />');
+            $listitem.append('<a />');
+            // if ul > li > a followed by ul, then is list link
+            if ($originlistitem.next().prop('tagName') == 'UL') {
+              var $headeritem = $('<li />');
+              $headeritem.append('<a />');
+              $headeritem
+                .find('a')
+                .text($originlistitem.text())
+                .prop('href', $originlistitem.prop('href'));
+              $listitem
+                .addClass('listlink')
+                .find('a')
+                .text($originlistitem.text())
+                .data(
+                  'sublist',
+                  parseMobileMenuRecursive($originlistitem.next(), $headeritem)
+                )
+                .click(function() {
+                  var $parentblock = $(this).parents('.menublock');
+                  $parentblock
+                    .next()
+                    .children('ul')
+                    .children('li:not(.backlink)')
+                    .detach();
+                  $parentblock
+                    .next()
+                    .children('ul')
+                    .append($(this).data('sublist'));
+                  positionMobileMenu($parentblock.index() + 1);
+                });
+            } else {
+              // otherwise direct link
+              $listitem
+                .find('a')
+                .text($originlistitem.text())
+                .prop('href', $originlistitem.prop('href'));
+            }
+
+            $list.append($listitem);
+          });
+
+        return $list.children('li');
+      }
+
+      function positionMobileMenu(activeindex) {
+        $('body').toggleClass('locked', activeindex > -1);
+        $('nav.mobile').toggleClass('open', activeindex > -1);
+
+        if (navigator.userAgent.match(/(iPhone|iPod|iPad)/i)) {
+          if (activeindex > -1) {
+            localStorage.cachedScrollPos = $currentScrollPos;
+            $('body').css({
+              position: 'fixed'
+            });
+          } else {
+            $('body').css({
+              position: 'relative'
+            });
+            $('body').scrollTop(localStorage.cachedScrollPos);
+          }
+        }
+
+        var offset = 0;
+        var colwidth = 10;
+
+        if (activeindex < 2) {
+          offset = activeindex - 2;
+        }
+
+        $('.menublock').each(function() {
+          $this = $(this);
+          var relativeindex = activeindex - $this.index();
+          $this.css('z-index', 5000 + $this.index());
+          $this.removeClass('closed');
+          var ratio = colwidth * (2 - relativeindex + offset);
+
+          if (relativeindex > 1) {
+            $this.find('.backtab').css('width', '0%');
+            $this.find('ul').css('width', '100%');
+          } else if (relativeindex < 0) {
+            $this.find('.backtab').css('width', '100%');
+            $this.find('ul').css('width', '0%');
+            $this.addClass('closed');
+          } else {
+            $this.find('.backtab').css('width', ratio + '%');
+            $this.find('ul').css('width', 100 - ratio + '%');
+          }
+        });
+      }
+
+      function initSearchField() {
+        $('li.search a').click(function() {
+          var $this = $(this).parent('li.search');
+          var _searchterm = $('#site-search-term').val();
+
+          if ($this.hasClass('focused')) {
+            $('#site-search').submit();
+          } else if ($this.data('focusout') != undefined) {
+            $('#site-search').submit();
+          } else {
+            $this.addClass('focused');
+            $this.find('input').focus();
+          }
+        });
+
+        $('#site-search-term').blur(function(event) {
+          var _searchterm = $(this).val();
+          var $parent = $(this).parents('li.search');
+
+          $parent.removeClass('focused');
+          //keep value long enough to find out if search button was clicked
+          $parent.data('focusout', _searchterm);
+          setTimeout(function() {
+            $('li.search').removeData('focusout');
+          }, 100);
+        });
+
+        $('#site-search').submit(function(event) {
+          var searchterm = $('#site-search-term').val();
+
+          if (!searchterm) {
+            event.preventDefault();
+          }
+        });
+      }
+
+      function menuScrollHandler() {
+        var _this = $('header');
+        var scrolldistance = $(document).scrollTop();
+        var remscroll = _this.data('remscroll');
+
+        if (scrolldistance > remscroll && scrolldistance > 100) {
+          _this.addClass('scrolled');
+        } else if (scrolldistance != remscroll) {
+          _this.removeClass('scrolled');
+        }
+
+        _this.data('remscroll', scrolldistance);
+      }
+    }
+  };
+
+  Drupal.behaviors.detectTouchScreen = {
+    attach: function(context, settings) {
+      var touchSupport =
+        'ontouchstart' in window || navigator.msMaxTouchPoints > 0;
+      if ($(window).width() >= 768 && touchSupport) {
+        $('body').addClass('touch');
+      }
+    }
+  };
+
+  Drupal.behaviors.initVideo = {
+    attach: function(context, settings) {
+      $('iframe[src*="youtube"], iframe[src*="vimeo"]', context).once().wrap('<div class="video-embed"></div>');
+      $('.captcha .video-embed iframe', context).unwrap();
+    }
+  };
+
+  Drupal.behaviors.wysiwygBtGrid = {
+    attach: function(context, settings) {
+      if ($('.textlift').find('.btgrid').length) {
+        var nextElementIsLiftupRow = $('.btgrid:last-of-type')
+          .closest('.textlift')
+          .next();
+
+        if (nextElementIsLiftupRow.hasClass('liftups')) {
+          $('.btgrid:last-of-type').css('marginBottom', '0');
+        }
+      }
+    }
+  };
+
+  Drupal.behaviors.bodyClass = {
+    attach: function(context, settings) {
+      if (settings.bodyClass) {
+        $('body').addClass(settings.bodyClass);
+      } else if (
+        $('body').hasClass('node-type-collection') === false &&
+        $('body').hasClass('front') === false
+      ) {
+        $('body').addClass('page');
+      }
+    }
+  };
+
+  Drupal.behaviors.frontpageSurvey = {
+    attach: function(context, settings) {
+      if ($.cookie) {
+        if ($.cookie('frontpage-survey') != 1) {
+          $('.frontpage-survey').show();
+        }
+
+        $('.close-overlay').click(function() {
+          $('.frontpage-survey').hide();
+          $.cookie('frontpage-survey', 1);
+        });
+
+        $('.frontpage-survey .btn').click(function() {
+          $.cookie('frontpage-survey', 1);
+        });
+      }
+    }
+  };
+
+  Drupal.behaviors.toggleEvent = {
+    attach: function(context, settings) {
+      $('#event-calendar-month td').click(function() {
+        $('.single-day').removeClass('selected'); // remove active class from all
+        $(this).addClass('selected');
+        var date = new Date($(this).data('date')).setHours(0, 0, 0, 0);
+        $('#event-calendar-sidebar-list .event').each(function() {
+          var startDate = new Date($(this).data('start-date')).setHours(
+            0,
+            0,
+            0,
+            0
+          );
+          var endDate = new Date($(this).data('end-date')).setHours(0, 0, 0, 0);
+          if (date >= startDate && date <= endDate) {
+            $(this).show('slow');
+          } else {
+            $(this).hide('slow');
+          }
+        });
+      });
+
+      $('#event-calendar-sidebar-list .event').each(function() {
+        var todayDate = new Date().setHours(0, 0, 0, 0);
+        var startDate = new Date($(this).data('start-date')).setHours(
+          0,
+          0,
+          0,
+          0
+        );
+        var endDate = new Date($(this).data('end-date')).setHours(0, 0, 0, 0);
+        if (todayDate >= startDate && todayDate <= endDate) {
+          $(this).show('slow');
+        } else {
+          $(this).hide('slow');
+        }
+      });
+
+      $('.event-details').click(function() {
+        $(this).toggleClass('open');
+        $(this)
+          .next('.event-time-and-location')
+          .toggle();
+      });
+
+      $('.event').click(function() {
+        var e = $(this).prop('data-open-event');
+        $('#' + e).toggle('slow');
+      });
+
+      $('#toggle-calendars').click(function() {
+        $('.add-to-calendar').toggle('slow');
+        return false;
+      });
+
+      $('.export-event').click(function() {
+        var title = $(this).data('title');
+        var eventId = $(this).data('event-id');
+        var startDate = $(this).data('start-date');
+        var endDate = $(this).data('end-date');
+        var description = $(this).data('description');
+        var location = $(this).data('location');
+
+        var eventCalendar = createCalendar({
+          options: {
+            class: 'event-export-details',
+            id: 'event-export-details-' + eventId // You need to pass an ID. If you don't, one will be generated for you.
+          },
+          data: {
+            title: title, // Event title
+            start: new Date(startDate), // Event start date
+            end: new Date(endDate), // You can also choose to set an end time.
+            address: location,
+            description: description
+          }
+        });
+
+        $('#event-export-' + eventId).html(eventCalendar);
+        $('#event-export-details-' + eventId).toggle('slow');
+        return false;
+      });
+    }
+  };
+
+  Drupal.behaviors.videoGallery = {
+    attach: function(context, settings) {
+      if (!jQuery().colorbox) {
+        return;
+      }
+
+      $('.video-gallery').colorbox({
+        iframe: true,
+        width: '80%',
+        height: '600px',
+        fixed: true,
+        href: function(){
+          var videoId = new RegExp('[\\?&]v=([^&#]*)').exec(this.href);
+          if (videoId && videoId[1]) {
+            return 'http://youtube.com/embed/'+videoId[1]+'?rel=0&wmode=transparent';
+          }
+        },
+        onComplete : function() {
+          $(this).colorbox.resize({
+            width: '80%',
+          });
+        }
+      });
+
+      function colorboxResize(resize) {
+        var width = $(window).width() > 900 ? '80%' : '95%';
+
+        $(this).colorbox.settings.width = width;
+
+        //if window is resized while lightbox open
+        if(resize) {
+          $(this).colorbox.resize({
+            'width': width
+          });
+        }
+      }
+
+      $(window).resize(function() {
+        colorboxResize(true);
+      });
+    }
+  };
+
+  Drupal.behaviors.careerTestSelect = {
+    attach: function(context, settings) {
+      var element = $('.career-test__filters select');
+      if (element.length > 0) {
+        // Change form action
+        $('.ctools-auto-submit-full-form').prop(
+          'action',
+          '/yliopisto/uratesti'
+        );
+        // Remove href from the title of article
+        $('article h3 a').each(function() {
+          $(this).replaceWith($(this).html());
+        });
+        $.fn.styleSelect = function() {
+          var originalElement = this;
+          var newElement = $('<div class="career-test__form"></div>');
+          var paragraphElement = $('<div class="career-test__toggle"></div>');
+          var listElement = $("<ul class='career-test__list'></ul>");
+
+          paragraphElement.text(
+            originalElement.children('option:selected').text()
+          );
+          newElement.append(paragraphElement);
+
+          paragraphElement.click(function(event) {
+            listElement.toggle();
+            event.stopPropagation();
+          });
+
+          originalElement.children().each(function(index) {
+            if (index === 0) return;
+            var originalItem = $(this);
+            var newItem = $('<li>' + originalItem.text() + '</li>');
+            newItem.attr('id', originalItem.val());
+            var currentId = originalElement.children('option:selected').val();
+
+            //$('li#' + currentId).addClass('active');
+            if(newItem.attr('id') == currentId) {
+              newItem.addClass('active');
+            }
+
+            newItem.click(function() {
+              $(this).addClass('active');
+              var selectedValue = $(this).attr('id');
+              var originalOptionToSelect = originalElement.find(
+                "option[value='" + selectedValue + "']"
+              );
+
+              //originalOptionToSelect.attr('selected', 'selected');
+              originalOptionToSelect.prop('selected', true);
+              originalOptionToSelect.change();
+              paragraphElement.text($(this).text());
+              originalItem.addClass('active');
+
+              // Track selected option
+              dataLayer.push({
+                'event' : 'GAEvent',
+                'eventCategory' : 'Urapolku',
+                'eventAction' : $(this).text(),
+                'eventLabel' : undefined,
+                'eventValue' : undefined
+              });
+
+            });
+            listElement.append(newItem);
+          });
+          originalElement.hide();
+          newElement.append(listElement);
+          newElement.insertBefore(originalElement);
+          $('.career-test__form ~ .career-test__form').remove();
+          return this;
+        };
+
+        element.styleSelect();
+
+        $('#careerTestBack').click(function(event) {
+          event.preventDefault();
+          var target = $('#views-exposed-form-career-test-page');
+          if( target.length ) {
+            $('html, body').scrollTop(target.offset().top);
+          }
+        });
+      }
+
+      $(document, context).ajaxComplete(function(event, jqXHR, settings) {
+        var target = $('#career-test-results');
+        if( target.length ) {
+          $('html, body').scrollTop(target.offset().top);
+        }
+      });
+
+    }
+  };
+
+  Drupal.behaviors.accordionBlock = {
+    attach: function (context, settings) {
+      $('.panel-heading a', context).click(function () {
+        $('.panel-heading').removeClass('active');
+        if (!$(this).closest('.panel').find('.panel-collapse').hasClass('in')) {
+          $(this).parents('.panel-heading').addClass('active');
+        }
+      });
+    }
+  };
+
+  Drupal.behaviors.socialShare = {
+    attach: function(context, settings) {
+
+      $('.js-social-share', context).click(function(event) {
+        event.preventDefault();
+
+        var width = 500;
+        var height = 300;
+
+        if ($(this).hasClass('facebook')) {
+          width = 600;
+          height = 650;
+        }
+
+        windowPopup($(this).attr("href"), width, height);
+      });
+
+      function windowPopup(url, width, height) {
+        // Calculate the position of the popup so
+        // it’s centered on the screen.
+        var left = (screen.width / 2) - (width / 2),
+            top = (screen.height / 2) - (height / 2);
+
+        window.open(
+            url,
+            "",
+            "menubar=no,toolbar=no,resizable=yes,scrollbars=yes,width=" + width + ",height=" + height + ",top=" + top + ",left=" + left
+        );
+      }
+
+    }
+  };
+  
+  Drupal.behaviors.publications = {
+    attach: function (context, settings) {
+      var firstPublicationImage = $('.publications .view-content .liftup').first().find('.publications-image img').attr('src');
+      $('.publications .image-container').css('background-image', 'url(' + firstPublicationImage + ')');
+      if(firstPublicationImage === undefined){
+        $('.publications .image-container .placeholder').css('display', 'block');
+      }
+      $('.publications .view-content .liftup').hover(function (e) {
+        event = e;
+        var path = $(event.target).find('.publications-image img').attr('src');
+        if(path === undefined) {
+          $('.publications .image-container .placeholder').css('display', 'block');
+        }
+        else {
+          $('.publications .image-container .placeholder').css('display', 'none');
+        }
+        $('.publications .image-container').css('background-image', 'url(' + path + ')');
+      });
+    }
+  };
+
+})(jQuery);
+;
+/* ========================================================================
+ * Bootstrap: collapse.js v3.3.6
+ * http://getbootstrap.com/javascript/#collapse
+ * ========================================================================
+ * Copyright 2011-2015 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/master/LICENSE)
+ * ======================================================================== */
+
+
++function ($) {
+  'use strict';
+
+  // COLLAPSE PUBLIC CLASS DEFINITION
+  // ================================
+
+  var Collapse = function (element, options) {
+    this.$element      = $(element)
+    this.options       = $.extend({}, Collapse.DEFAULTS, options)
+    this.$trigger      = $('[data-toggle="collapse"][href="#' + element.id + '"],' +
+                           '[data-toggle="collapse"][data-target="#' + element.id + '"]')
+    this.transitioning = null
+
+    if (this.options.parent) {
+      this.$parent = this.getParent()
+    } else {
+      this.addAriaAndCollapsedClass(this.$element, this.$trigger)
+    }
+
+    if (this.options.toggle) this.toggle()
+  }
+
+  Collapse.VERSION  = '3.3.6'
+
+  Collapse.TRANSITION_DURATION = 350
+
+  Collapse.DEFAULTS = {
+    toggle: true
+  }
+
+  Collapse.prototype.dimension = function () {
+    var hasWidth = this.$element.hasClass('width')
+    return hasWidth ? 'width' : 'height'
+  }
+
+  Collapse.prototype.show = function () {
+    if (this.transitioning || this.$element.hasClass('in')) return
+
+    var activesData
+    var actives = this.$parent && this.$parent.children('.panel').children('.in, .collapsing')
+
+    if (actives && actives.length) {
+      activesData = actives.data('bs.collapse')
+      if (activesData && activesData.transitioning) return
+    }
+
+    var startEvent = $.Event('show.bs.collapse')
+    this.$element.trigger(startEvent)
+    if (startEvent.isDefaultPrevented()) return
+
+    if (actives && actives.length) {
+      Plugin.call(actives, 'hide')
+      activesData || actives.data('bs.collapse', null)
+    }
+
+    var dimension = this.dimension()
+
+    this.$element
+      .removeClass('collapse')
+      .addClass('collapsing')[dimension](0)
+      .attr('aria-expanded', true)
+
+    this.$trigger
+      .removeClass('collapsed')
+      .attr('aria-expanded', true)
+
+    this.transitioning = 1
+
+    var complete = function () {
+      this.$element
+        .removeClass('collapsing')
+        .addClass('collapse in')[dimension]('')
+      this.transitioning = 0
+      this.$element
+        .trigger('shown.bs.collapse')
+    }
+
+    if (!$.support.transition) return complete.call(this)
+
+    var scrollSize = $.camelCase(['scroll', dimension].join('-'))
+
+    this.$element
+      .one('bsTransitionEnd', $.proxy(complete, this))
+      .emulateTransitionEnd(Collapse.TRANSITION_DURATION)[dimension](this.$element[0][scrollSize])
+  }
+
+  Collapse.prototype.hide = function () {
+    if (this.transitioning || !this.$element.hasClass('in')) return
+
+    var startEvent = $.Event('hide.bs.collapse')
+    this.$element.trigger(startEvent)
+    if (startEvent.isDefaultPrevented()) return
+
+    var dimension = this.dimension()
+
+    this.$element[dimension](this.$element[dimension]())[0].offsetHeight
+
+    this.$element
+      .addClass('collapsing')
+      .removeClass('collapse in')
+      .attr('aria-expanded', false)
+
+    this.$trigger
+      .addClass('collapsed')
+      .attr('aria-expanded', false)
+
+    this.transitioning = 1
+
+    var complete = function () {
+      this.transitioning = 0
+      this.$element
+        .removeClass('collapsing')
+        .addClass('collapse')
+        .trigger('hidden.bs.collapse')
+    }
+
+    if (!$.support.transition) return complete.call(this)
+
+    this.$element
+      [dimension](0)
+      .one('bsTransitionEnd', $.proxy(complete, this))
+      .emulateTransitionEnd(Collapse.TRANSITION_DURATION)
+  }
+
+  Collapse.prototype.toggle = function () {
+    this[this.$element.hasClass('in') ? 'hide' : 'show']()
+  }
+
+  Collapse.prototype.getParent = function () {
+    return $(this.options.parent)
+      .find('[data-toggle="collapse"][data-parent="' + this.options.parent + '"]')
+      .each($.proxy(function (i, element) {
+        var $element = $(element)
+        this.addAriaAndCollapsedClass(getTargetFromTrigger($element), $element)
+      }, this))
+      .end()
+  }
+
+  Collapse.prototype.addAriaAndCollapsedClass = function ($element, $trigger) {
+    var isOpen = $element.hasClass('in')
+
+    $element.attr('aria-expanded', isOpen)
+    $trigger
+      .toggleClass('collapsed', !isOpen)
+      .attr('aria-expanded', isOpen)
+  }
+
+  function getTargetFromTrigger($trigger) {
+    var href
+    var target = $trigger.attr('data-target')
+      || (href = $trigger.attr('href')) && href.replace(/.*(?=#[^\s]+$)/, '') // strip for ie7
+
+    return $(target)
+  }
+
+
+  // COLLAPSE PLUGIN DEFINITION
+  // ==========================
+
+  function Plugin(option) {
+    return this.each(function () {
+      var $this   = $(this)
+      var data    = $this.data('bs.collapse')
+      var options = $.extend({}, Collapse.DEFAULTS, $this.data(), typeof option == 'object' && option)
+
+      if (!data && options.toggle && /show|hide/.test(option)) options.toggle = false
+      if (!data) $this.data('bs.collapse', (data = new Collapse(this, options)))
+      if (typeof option == 'string') data[option]()
+    })
+  }
+
+  var old = $.fn.collapse
+
+  $.fn.collapse             = Plugin
+  $.fn.collapse.Constructor = Collapse
+
+
+  // COLLAPSE NO CONFLICT
+  // ====================
+
+  $.fn.collapse.noConflict = function () {
+    $.fn.collapse = old
+    return this
+  }
+
+
+  // COLLAPSE DATA-API
+  // =================
+
+  $(document).on('click.bs.collapse.data-api', '[data-toggle="collapse"]', function (e) {
+    var $this   = $(this)
+
+    if (!$this.attr('data-target')) e.preventDefault()
+
+    var $target = getTargetFromTrigger($this)
+    var data    = $target.data('bs.collapse')
+    var option  = data ? 'toggle' : $this.data()
+
+    Plugin.call($target, option)
+  })
+
+}(jQuery);
+;

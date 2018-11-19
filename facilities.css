@@ -1,0 +1,24 @@
+/* Create two unequal columns that floats next to each other */
+.column {
+    float: left;
+    padding: 5px;
+    /*height: 700px; /* Should be removed. Only for demonstration */
+}
+
+.left {
+  width: 50%;
+}
+
+.right {
+  width: 50%;
+  /*height: 600px; */
+}
+
+#rw {
+    width: 50%;
+}
+
+
+
+
+

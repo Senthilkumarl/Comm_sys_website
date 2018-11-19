@@ -1,0 +1,24 @@
+window.fbAsyncInit = function() {
+  FB.init({
+    appId      : '1695939287402617',
+    xfbml      : true,
+    version    : 'v2.8'
+  });
+  FB.AppEvents.logPageView();
+};
+;
+jQuery(document).ready(function(){
+
+  jQuery(window).resize(function() {
+     if(this.resizeTO) clearTimeout(this.resizeTO);
+     this.resizeTO = setTimeout(function() {
+        jQuery(this).trigger('resizeEnd');
+     }, 500);
+  });
+
+  jQuery(window).bind('resizeEnd', function() {
+     FB.XFBML.parse();
+  });
+
+});
+;
